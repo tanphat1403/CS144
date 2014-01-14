@@ -1,0 +1,16 @@
+sr_solution binary was built for x86_64 architecture
+
+pox should be under ~/pox (see symbolic link)
+(clone the pox repo and checkout to f95dd1a81584d716823bbf565fa68254416af603)
+
+in case you are missing dependencies:
+sudo apt-get install python-twisted
+
+git clone git://github.com/dound/ltprotocol.git
+cd ltprotocol
+sudo python setup.py install
+
+you should then be able to run config.sh without errors
+
+
+Antonin, Winter 2013-2014
