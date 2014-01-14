@@ -4,7 +4,9 @@ pox should be under ~/pox (see symbolic link)
 (clone the pox repo and checkout to f95dd1a81584d716823bbf565fa68254416af603)
 
 in case you are missing dependencies:
-sudo apt-get install python-twisted
+sudo apt-get install python-setuptools python-twisted
+
+sudo apt-get install expect
 
 git clone git://github.com/dound/ltprotocol.git
 cd ltprotocol
