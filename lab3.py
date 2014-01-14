@@ -14,7 +14,7 @@ from mininet.moduledeps import pathCheck
 
 from sys import exit
 import os.path
-from subprocess import Popen, STDOUT, PIPE
+from subprocess import Popen, STDOUT, PIPE, check_call
 
 IPBASE = '10.3.0.0/16'
 ROOTIP = '10.3.0.100/16'
@@ -29,7 +29,7 @@ class CS144Topo( Topo ):
         server1 = self.addHost( 'server1' )
         server2 = self.addHost( 'server2' )
         router = self.addSwitch( 'sw0' )
-        client = self.addHost('client')
+        client = self.addHost('client', inNamespace=False)
         for h in server1, server2, client:
             self.addLink( h, router )
 
@@ -107,6 +107,20 @@ def set_default_route(host):
     ips = IP_SETTING[host.name].split(".") 
     host.cmd('route del -net %s.0.0.0/8 dev %s-eth0' % (ips[0], host.name))
 
+def set_default_route_client(host):
+    info('*** setting default gateway of client %s\n' % host.name)
+    routerip = IP_SETTING['sw0-eth3']
+    print host.name, routerip
+    for eth in ['sw0-eth1', 'sw0-eth2', 'sw0-eth3']:
+        swip = IP_SETTING[eth]
+        pref = ".".join(swip.split(".")[:-1]) + ".0"
+        print pref
+        check_call('route add -net %s/24 gw 10.0.1.1 dev client-eth0' % (pref), shell = True)
+        # host.cmd('route add %s/24 dev client-eth0' % (pref))
+    # host.cmd('route add default gw %s dev %s-eth0' % (routerip, host.name))
+    # ips = IP_SETTING[host.name].split(".") 
+    # host.cmd('route del -net %s.0.0.0/8 dev %s-eth0' % (ips[0], host.name))
+
 def get_ip_setting():
     try:
         with open(IPCONFIG_FILE, 'r') as f:
@@ -137,8 +151,9 @@ def cs144net():
     clintf.setIP('%s/8' % IP_SETTING['client'])
 
 
-    for host in server1, server2, client:
+    for host in server1, server2:
         set_default_route(host)
+    set_default_route_client(client)
     starthttp( server1 )
     starthttp( server2 )
     CLI( net )
