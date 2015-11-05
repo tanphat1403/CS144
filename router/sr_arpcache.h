@@ -115,7 +115,7 @@ struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
    that corresponds to this ARP request. The packet argument should not be
    freed by the caller.
 
-   A pointer to the ARP request is returned; it should be freed. The caller
+   A pointer to the ARP request is returned; it should not be freed. The caller
    can remove the ARP request from the queue by calling sr_arpreq_destroy. */
 struct sr_arpreq *sr_arpcache_queuereq(struct sr_arpcache *cache,
                          uint32_t ip,
