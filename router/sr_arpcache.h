@@ -24,7 +24,7 @@
    handle sending ARP requests if necessary:
 
    function handle_arpreq(req):
-       if difftime(now, req->sent) > 1.0
+       if difftime(now, req->sent) >= 1.0
            if req->times_sent >= 5:
                send icmp host unreachable to source addr of all pkts waiting
                  on this request
