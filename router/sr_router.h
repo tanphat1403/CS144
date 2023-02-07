@@ -30,6 +30,11 @@
 #define INIT_TTL 255
 #define PACKET_DUMP_SIZE 1024
 
+#define DEST_NET_UNREACHABLE   1
+#define DEST_HOST_UNREACHABLE  2
+#define PORT_UNREACHABLE       3
+#define TTL_EXCEEDED           4
+
 /* forward declare */
 struct sr_if;
 struct sr_rt;
@@ -67,11 +72,38 @@ int sr_read_from_server(struct sr_instance* );
 /* -- sr_router.c -- */
 void sr_init(struct sr_instance* );
 void sr_handlepacket(struct sr_instance* , uint8_t * , unsigned int , char* );
+void handle_arp_request(struct sr_instance* sr, struct sr_arpreq* req);
+int validate(uint8_t* buf, uint32_t len);
+struct sr_rt* check_rt(struct sr_instance *sr, uint32_t dip);
 
 /* -- sr_if.c -- */
 void sr_add_interface(struct sr_instance* , const char* );
 void sr_set_ether_ip(struct sr_instance* , uint32_t );
 void sr_set_ether_addr(struct sr_instance* , const unsigned char* );
 void sr_print_if_list(struct sr_instance* );
-
+void send_icmp_reply(struct sr_instance* sr,
+            uint32_t sip,
+            uint32_t dip,
+            uint8_t smac[ETHER_ADDR_LEN],
+            uint8_t dmac[ETHER_ADDR_LEN],
+            uint16_t ip_id,
+            uint32_t icmp_unused,
+            uint8_t *icmp_data,
+            uint16_t icmp_data_len,
+            struct sr_rt* rt);
+void send_icmp_exception(struct sr_instance* sr,
+            uint32_t dip,
+            uint8_t dmac[ETHER_ADDR_LEN],
+            uint16_t ip_id,
+            uint8_t *icmp_data,
+            uint16_t icmp_data_len,
+            uint8_t icmp_exeption_type);
+void foward_ip_packet(struct sr_instance* sr, 
+                uint8_t* packet, 
+                unsigned int len, 
+                struct sr_rt* rt, 
+                struct sr_arpentry* entry);
+void handle_arp_request(struct sr_instance* sr, struct sr_arpreq* req);
+void send_icmp_exception_all_packet(struct sr_instance* sr, struct sr_packet* packet);
+void send_arp_request(struct sr_instance* sr, uint32_t dip, struct sr_rt* rt);
 #endif /* SR_ROUTER_H */

@@ -16,8 +16,20 @@
   checking whether we should resend an request or destroy the arp request.
   See the comments in the header file for an idea of what it should look like.
 */
+
+
+
 void sr_arpcache_sweepreqs(struct sr_instance *sr) { 
     /* Fill this in */
+    struct sr_arpreq* req = sr->cache.requests;
+    struct sr_arpreq* next;
+    while(req != NULL)
+    {
+        next = req->next;
+        handle_arp_request(sr, req);
+        req = next;
+    }
+
 }
 
 /* You should not need to touch the rest of this code. */
@@ -99,7 +111,7 @@ struct sr_arpreq *sr_arpcache_queuereq(struct sr_arpcache *cache,
    1) Looks up this IP in the request queue. If it is found, returns a pointer
       to the sr_arpreq with this IP. Otherwise, returns NULL.
    2) Inserts this IP to MAC mapping in the cache, and marks it valid. */
-struct sr_arpreq *sr_arpcache_insert(struct sr_arpcache *cache,
+struct sr_arpreq * sr_arpcache_insert(struct sr_arpcache *cache,
                                      unsigned char *mac,
                                      uint32_t ip)
 {
@@ -187,7 +199,7 @@ void sr_arpcache_dump(struct sr_arpcache *cache) {
     
     int i;
     for (i = 0; i < SR_ARPCACHE_SZ; i++) {
-        struct sr_arpentry *cur = &(cache->entries[i]);
+       struct sr_arpentry *cur = &(cache->entries[i]);
         unsigned char *mac = cur->mac;
         fprintf(stderr, "%.1x%.1x%.1x%.1x%.1x%.1x   %.8x   %.24s   %d\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], ntohl(cur->ip), ctime(&(cur->added)), cur->valid);
     }
